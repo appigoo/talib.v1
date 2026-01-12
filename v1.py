@@ -10,8 +10,8 @@ import streamlit as st
 
 TA_LIB_PATH = "/usr/lib/libta_lib.so"
 
-if not os.path.exists(TA_LIB_PATH):
-    st.info("Installing TA-Lib C library...")
+def install_talib():
+    st.warning("Building TA-Lib (this runs once, may take 1–2 minutes)...")
 
     cmd = """
     set -e
@@ -25,10 +25,10 @@ if not os.path.exists(TA_LIB_PATH):
     cd ta-lib
 
     echo "Configuring..."
-    ./configure --prefix=/usr
+    ./configure --prefix=/usr --disable-shared --enable-static
 
-    echo "Building..."
-    make -j2
+    echo "Building (low resource mode)..."
+    make -j1
 
     echo "Installing..."
     make install
@@ -39,7 +39,11 @@ if not os.path.exists(TA_LIB_PATH):
         check=True
     )
 
+if not os.path.exists(TA_LIB_PATH):
+    install_talib()
+
 import talib
+
 
 
 
