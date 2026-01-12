@@ -2,16 +2,23 @@
 import yfinance as yf
 import talib
 import pandas as pd
-import numpy as np
+#import numpy as np
 import matplotlib.pyplot as plt
 import os
 import subprocess
 import streamlit as st
 
-TA_LIB_PATH = "/usr/lib/libta_lib.so"
+# ============================
+# TA-Lib final fallback config
+# ============================
+
+TA_LIB_SO = "/usr/local/lib/libta_lib.so"
+
+# Ensure loader can find shared libs
+os.environ["LD_LIBRARY_PATH"] = "/usr/local/lib:" + os.environ.get("LD_LIBRARY_PATH", "")
 
 def install_talib():
-    st.warning("Building TA-Lib (this runs once, may take 1–2 minutes)...")
+    st.warning("Building TA-Lib (final fallback mode). This runs once and may take ~2 minutes.")
 
     cmd = """
     set -e
@@ -24,10 +31,10 @@ def install_talib():
 
     cd ta-lib
 
-    echo "Configuring..."
-    ./configure --prefix=/usr --disable-shared --enable-static
+    echo "Configuring (static, low memory)..."
+    ./configure --prefix=/usr/local --disable-shared --enable-static
 
-    echo "Building (low resource mode)..."
+    echo "Building (single core)..."
     make -j1
 
     echo "Installing..."
@@ -39,13 +46,21 @@ def install_talib():
         check=True
     )
 
-if not os.path.exists(TA_LIB_PATH):
+if not os.path.exists(TA_LIB_SO):
     install_talib()
+
+# ============================
+# Safe import after build
+# ============================
 
 import talib
 
+# ---- minimal sanity check ----
+import numpy as np
+x = np.random.rand(50)
+_ = talib.RSI(x, timeperiod=14)
 
-
+st.success("TA-Lib loaded successfully.")
 
 # =====================
 # Pattern Classification
