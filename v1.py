@@ -66,7 +66,7 @@ if st.button("開始掃描"):
 
     for sym in symbols.split(","):
         stock = yf.Ticker(sym.strip())
-        df = stock.history(period="30d", interval=interval).reset_index()
+        df = stock.history(period="1mo", interval=interval).reset_index()
         #df = yf.history(sym.strip(), period="30d", interval=interval)
 
         if len(df) < 20:
