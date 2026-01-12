@@ -1,4 +1,4 @@
-import streamlit as st
+#import streamlit as st
 import yfinance as yf
 import talib
 import pandas as pd
@@ -6,20 +6,41 @@ import numpy as np
 import matplotlib.pyplot as plt
 import os
 import subprocess
-import sys
+import streamlit as st
 
-if not os.path.exists("/usr/lib/libta_lib.so"):
-    subprocess.check_call([
-        "bash", "-c",
-        """
-        wget http://prdownloads.sourceforge.net/ta-lib/ta-lib-0.4.0-src.tar.gz &&
-        tar -xzf ta-lib-0.4.0-src.tar.gz &&
-        cd ta-lib &&
-        ./configure --prefix=/usr &&
-        make &&
-        make install
-        """
-    ])
+TA_LIB_PATH = "/usr/lib/libta_lib.so"
+
+if not os.path.exists(TA_LIB_PATH):
+    st.info("Installing TA-Lib C library...")
+
+    cmd = """
+    set -e
+
+    echo "Downloading TA-Lib source..."
+    wget -O ta-lib.tar.gz https://downloads.sourceforge.net/project/ta-lib/ta-lib/0.4.0/ta-lib-0.4.0-src.tar.gz
+
+    echo "Extracting..."
+    tar -xzf ta-lib.tar.gz
+
+    cd ta-lib
+
+    echo "Configuring..."
+    ./configure --prefix=/usr
+
+    echo "Building..."
+    make -j2
+
+    echo "Installing..."
+    make install
+    """
+
+    subprocess.run(
+        ["bash", "-c", cmd],
+        check=True
+    )
+
+import talib
+
 
 
 # =====================
