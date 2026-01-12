@@ -4,6 +4,23 @@ import talib
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import os
+import subprocess
+import sys
+
+if not os.path.exists("/usr/lib/libta_lib.so"):
+    subprocess.check_call([
+        "bash", "-c",
+        """
+        wget http://prdownloads.sourceforge.net/ta-lib/ta-lib-0.4.0-src.tar.gz &&
+        tar -xzf ta-lib-0.4.0-src.tar.gz &&
+        cd ta-lib &&
+        ./configure --prefix=/usr &&
+        make &&
+        make install
+        """
+    ])
+
 
 # =====================
 # Pattern Classification
